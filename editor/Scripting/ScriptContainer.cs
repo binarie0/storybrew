@@ -118,12 +118,6 @@ namespace StorybrewEditor.Scripting
                     {
                         Assembly assembly = assemblyLoadContext.LoadFromAssemblyPath(assemblyPath);
                         
-
-                        foreach (AssemblyName assName in assembly.GetReferencedAssemblies())
-                        {
-                            Debug.WriteLine(assName.Name);
-                        }
-                        
                         scriptType = assembly.GetType(ScriptTypeName);
                         if (scriptType == null)
                             throw new TypeLoadException($"Type {ScriptTypeName} was not found in assembly");
