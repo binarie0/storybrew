@@ -216,17 +216,17 @@ namespace StorybrewEditor.Scripting
                     Trace.Assert(importedAssembly != null);
 
                     compileNode.SetAttribute("Include", importedAssembly.Name);
+                    //var hintPath = document.CreateElement("HintPath", xmlns);
+                    //hintPath.AppendChild(document.CreateTextNode(@$"..\..\{relativePath}"));
+                    //compileNode.AppendChild(hintPath);
+
                     var hintPath = document.CreateElement("HintPath", xmlns);
-                    hintPath.AppendChild(document.CreateTextNode(@$"..\..\{relativePath}"));
-                    compileNode.AppendChild(hintPath);
-                    
-                    hintPath = document.CreateElement("HintPath", xmlns);
                     hintPath.AppendChild(document.CreateTextNode(@$"{relativePath}"));
                     compileNode.AppendChild(hintPath);
 
-                    hintPath = document.CreateElement("HintPath", xmlns);
-                    hintPath.AppendChild(document.CreateTextNode(@$"{path}"));
-                    compileNode.AppendChild(hintPath);
+                    //hintPath = document.CreateElement("HintPath", xmlns);
+                    //hintPath.AppendChild(document.CreateTextNode(@$"{path}"));
+                    //compileNode.AppendChild(hintPath);
 
                     referencedAssembliesGroup.AppendChild(compileNode);
                 }
