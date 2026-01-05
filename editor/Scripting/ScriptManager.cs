@@ -29,12 +29,6 @@ namespace StorybrewEditor.Scripting
             set
             {
                 referencedAssemblies = new List<string>(value);
-                //Trace.WriteLine("REFERENCED ASSEMBLIES!");
-                //foreach (var assembly in referencedAssemblies)
-                //{
-                //    Trace.WriteLine(assembly);
-                //}
-                //Trace.WriteLine("\n\n\n\n\n\n\n");
                 foreach (var scriptContainer in scriptContainers.Values)
                     scriptContainer.ReferencedAssemblies = referencedAssemblies;
                 updateSolutionFiles();

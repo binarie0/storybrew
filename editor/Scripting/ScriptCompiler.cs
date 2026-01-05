@@ -20,7 +20,13 @@ namespace StorybrewEditor.Scripting
 
             foreach (var assembly in referencedAssemblies)
                 if (File.Exists(assembly))
-                    references.Add(MetadataReference.CreateFromFile(assembly));
+                {
+                    //Debug.WriteLine($"Assembly exists at {assembly}");
+
+                    PortableExecutableReference metaRef = MetadataReference.CreateFromFile(assembly);
+                    //Debug.WriteLine(metaRef.Display);
+                    references.Add(metaRef);
+                }
 
             var compilation = CSharpCompilation.Create(
                 assemblyName: Path.GetFileNameWithoutExtension(outputPath),
