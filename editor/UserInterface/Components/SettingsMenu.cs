@@ -4,6 +4,9 @@ using OpenTK;
 using StorybrewEditor.ScreenLayers;
 using StorybrewEditor.Storyboarding;
 using System.Diagnostics;
+using ManagedBass;
+using System.Collections.Generic;
+using ManagedBass.Fx;
 
 namespace StorybrewEditor.UserInterface.Components
 {
@@ -16,9 +19,13 @@ namespace StorybrewEditor.UserInterface.Components
         public override Vector2 MaxSize => layout.MaxSize;
         public override Vector2 PreferredSize => layout.PreferredSize;
 
+        //The system's current devices are mapped via int.
+        Dictionary<string, int> deviceMap;
+
         public SettingsMenu(WidgetManager manager, Project project) : base(manager)
         {
             this.project = project;
+
 
             Button referencedAssemblyButton, floatingPointTimeButton, audioHelpButton, helpButton;
             Label dimLabel;
@@ -103,7 +110,22 @@ namespace StorybrewEditor.UserInterface.Components
                 FileName = $"https://github.com/{Program.Repository}/wiki",
                 UseShellExecute = true
             });
-            audioHelpButton.OnClick += (sender, e) => Manager.ScreenLayerManager.Add(new AudioHelpConfig());
+            audioHelpButton.OnClick += (sender, e) =>
+            {
+                deviceMap = new Dictionary<string, int>();
+                for (int i = 1; i < Bass.DeviceCount; i++)
+                {
+                    if (Bass.GetDeviceInfo(i, out DeviceInfo info) && info.IsEnabled)
+                    {
+                        deviceMap[info.Name] = i;
+                        Debug.WriteLine($"{info.Name} - {i}");
+                    }
+                }
+                Manager.ScreenLayerManager.ShowContextMenu("Choose output device.", (s) =>
+                {
+                    Program.AudioManager.SwapAudioOutputDevice(deviceMap[s]);
+                }, deviceMap.Keys);
+            };
             referencedAssemblyButton.OnClick += (sender, e) => Manager.ScreenLayerManager.Add(new ReferencedAssemblyConfig(project));
             dimSlider.OnValueChanged += (sender, e) =>
             {
