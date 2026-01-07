@@ -20,7 +20,7 @@ namespace StorybrewEditor.UserInterface.Components
         {
             this.project = project;
 
-            Button referencedAssemblyButton, floatingPointTimeButton, helpButton;
+            Button referencedAssemblyButton, floatingPointTimeButton, audioHelpButton, helpButton;
             Label dimLabel;
             Slider dimSlider;
 
@@ -86,6 +86,13 @@ namespace StorybrewEditor.UserInterface.Components
                                 Checked = project.ExportSettings.UseFloatForTime,
                                 Tooltip = "A storyboard exported with this option enabled\nwill only be compatible with lazer",
                             },
+                            audioHelpButton = new Button(manager)
+                            {
+                                Text = "Audio Help",
+                                AnchorFrom = BoxAlignment.Centre,
+                                AnchorTo = BoxAlignment.Centre,
+                                Tooltip = "Use this to help with audio troubles."
+                            }
                         }
                     }
                 },
@@ -96,6 +103,7 @@ namespace StorybrewEditor.UserInterface.Components
                 FileName = $"https://github.com/{Program.Repository}/wiki",
                 UseShellExecute = true
             });
+            audioHelpButton.OnClick += (sender, e) => Manager.ScreenLayerManager.Add(new AudioHelpConfig());
             referencedAssemblyButton.OnClick += (sender, e) => Manager.ScreenLayerManager.Add(new ReferencedAssemblyConfig(project));
             dimSlider.OnValueChanged += (sender, e) =>
             {
