@@ -71,6 +71,7 @@ namespace StorybrewEditor.UserInterface.Components
         private void placementUi_onClickUp(WidgetEvent evt, MouseButtonEventArgs e)
         {
             state = State.Idle;
+            
         }
         private void placementUi_onClickMove(WidgetEvent evt, MouseMoveEventArgs e)
         {
@@ -105,6 +106,9 @@ namespace StorybrewEditor.UserInterface.Components
                     break;
             }
             dragStartPosition = dragEndPosition;
+            Segment.Position = editorSegment.PlacementPosition;
+            Segment.Rotation = editorSegment.PlacementRotation;
+            Segment.Scale = editorSegment.PlacementScale;
         }
 
         protected override void DrawBackground(DrawContext drawContext, float actualOpacity)

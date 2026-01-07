@@ -30,7 +30,6 @@ namespace StorybrewEditor.UserInterface.Drawables
             transform = Segment.BuildTransform(ParentTransform);
             scaleFactor = bounds.Height / 480;
             offset = new Vector2(bounds.Left + bounds.Width * 0.5f - 320 * scaleFactor, bounds.Top);
-
             var center = StoryboardToScreen(transform.ApplyToPosition(Vector2.Zero));
             var top = StoryboardToScreen(transform.ApplyToPosition(Vector2.UnitY * -10000));
             var bottom = StoryboardToScreen(transform.ApplyToPosition(Vector2.UnitY * 10000));
