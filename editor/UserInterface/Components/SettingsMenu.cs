@@ -84,6 +84,12 @@ namespace StorybrewEditor.UserInterface.Components
                                     },
                                 }
                             },
+                            audioHelpButton = new Button(manager)
+                            {
+                                Text = "Swap Output Device",
+                                AnchorFrom = BoxAlignment.Centre,
+                                AnchorTo = BoxAlignment.Centre,
+                            },
                             floatingPointTimeButton = new Button(manager)
                             {
                                 Text = "Export Time as Floating Point",
@@ -92,14 +98,8 @@ namespace StorybrewEditor.UserInterface.Components
                                 Checkable = true,
                                 Checked = project.ExportSettings.UseFloatForTime,
                                 Tooltip = "A storyboard exported with this option enabled\nwill only be compatible with lazer",
-                            },
-                            audioHelpButton = new Button(manager)
-                            {
-                                Text = "Audio Help",
-                                AnchorFrom = BoxAlignment.Centre,
-                                AnchorTo = BoxAlignment.Centre,
-                                Tooltip = "Use this to help with audio troubles."
                             }
+                            
                         }
                     }
                 },
