@@ -243,14 +243,14 @@ namespace StorybrewEditor.UserInterface.Components
                 $"using {effect.BaseName} ({StringHelper.ToByteSize(layer.EstimatedSize)})" :
                 $"using {effect.BaseName}";
 
-            string separator = "\nLayers:\n";
+            //string separator = "\nLayers:\n";
 
-            //return usingData;
-            string segmentString = GetSegments(layer);
+            ////return usingData;
+            //string segmentString = GetSegments(layer);
 
-            return layer.NamedSegments.Any() ? string.Concat(usingData, separator, segmentString.AsSpan(0, Math.Min(segmentString.Length, 128))) :
-                usingData;
-
+            //return layer.NamedSegments.Any() ? string.Concat(usingData, separator, segmentString.AsSpan(0, Math.Min(segmentString.Length, 128))) :
+            //    usingData;
+            return usingData;
 
         }
 
