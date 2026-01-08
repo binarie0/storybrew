@@ -14,7 +14,7 @@ namespace StorybrewEditor.UserInterface.Drawables
         public Vector2 MinSize => Vector2.Zero;
         public Vector2 PreferredSize => new Vector2(854, 480);
 
-        public const float RingDistance = 240;
+        public const float RingDistance = 120;
 
         public StoryboardSegment Segment { get; set; }
         public StoryboardTransform ParentTransform { get; set; }
@@ -35,6 +35,13 @@ namespace StorybrewEditor.UserInterface.Drawables
             var bottom = StoryboardToScreen(transform.ApplyToPosition(Vector2.UnitY * 10000));
             var left = StoryboardToScreen(transform.ApplyToPosition(Vector2.UnitX * -10000));
             var right = StoryboardToScreen(transform.ApplyToPosition(Vector2.UnitX * 10000));
+
+            var positionOffset = PreferredSize * 0.5f;
+            center += positionOffset;
+            top += positionOffset;
+            bottom += positionOffset;
+            left += positionOffset;
+            right += positionOffset;
 
             var renderer = DrawState.Prepare(drawContext.Get<LineRenderer>(), camera, linesRenderStates);
             renderer.DrawSquare(new Vector3(bounds.Left, bounds.Top, 0), new Vector3(bounds.Right, bounds.Bottom, 0), Color4.DarkGray);

@@ -25,6 +25,12 @@ namespace StorybrewEditor.UserInterface.Components
             }
         }
 
+        /// <summary>
+        /// Actually, this wasn't even necessary. Since a segment can take care of its own position, rotation, and scale
+        /// it ended up being easier to just directly edit those values instead of monitoring the placement scale, rotation, and position.
+        /// </summary>
+        //private EditorStoryboardSegment editorSegment;
+
         public override Vector2 MinSize => placementDrawable?.MinSize ?? Vector2.Zero;
         public override Vector2 PreferredSize => placementDrawable?.PreferredSize ?? Vector2.Zero;
 
@@ -57,7 +63,8 @@ namespace StorybrewEditor.UserInterface.Components
         {
             if (e.Button == MouseButton.Left)
             {
-                dragStartPosition = new Vector2(e.Position.X, e.Position.Y);
+                //editorSegment = Segment.AsEditorSegment();
+                dragStartPosition = new Vector2(e.X, e.Y);
                 var keyboardState = Keyboard.GetState();
                 if (keyboardState.IsKeyDown(Key.ShiftLeft))
                     state = State.Scaling;
@@ -71,7 +78,7 @@ namespace StorybrewEditor.UserInterface.Components
         private void placementUi_onClickUp(WidgetEvent evt, MouseButtonEventArgs e)
         {
             state = State.Idle;
-            
+            //editorSegment = null;
         }
         private void placementUi_onClickMove(WidgetEvent evt, MouseMoveEventArgs e)
         {
@@ -80,35 +87,40 @@ namespace StorybrewEditor.UserInterface.Components
 
             Debug.Assert(e.XDelta != 0 || e.YDelta != 0);
 
-            var editorSegment = Segment.AsEditorSegment();
-            var dragEndPosition = dragStartPosition + new Vector2(e.XDelta, e.YDelta);
+            Vector2 mouseDelta = new Vector2(e.XDelta, e.YDelta);
+            var dragEndPosition = dragStartPosition + mouseDelta;
             var dragFrom = placementDrawable.ScreenToSegment(dragStartPosition);
             var dragTo = placementDrawable.ScreenToSegment(dragEndPosition);
 
+            var deltaSegment = dragTo - dragFrom;
             //Debug.Assert(dragFrom != dragTo);
 
             switch (state)
             {
                 case State.Moving:
-                    editorSegment.PlacementPosition += dragTo - dragFrom;
+                    Segment.Position += deltaSegment;
+                    //editorSegment.PlacementPosition += deltaSegment;
                     break;
                 case State.Scaling:
-                    var oldScale = editorSegment.PlacementScale;
-                    editorSegment.PlacementScale *= dragTo.Length / dragFrom.Length;
-                    if (editorSegment.PlacementScale == 0)
-                        editorSegment.PlacementScale = oldScale;
+                    var oldScale = Segment.Scale;
+                    //editorSegment.PlacementScale *= dragTo.Length / dragFrom.Length;
+                    Segment.Scale *= dragTo.Length / dragFrom.Length;
+                    if (Segment.Scale == 0)
+                    {
+                        //editorSegment.PlacementScale = oldScale;
+                        Segment.Scale = oldScale;
+                    }
                     break;
                 case State.Rotating:
                     var fromAngle = Math.Atan2(dragFrom.Y, dragFrom.X);
                     var toAngle = Math.Atan2(dragTo.Y, dragTo.X);
                     var angleDelta = toAngle - fromAngle;
-                    editorSegment.PlacementRotation += angleDelta;
+                    //editorSegment.PlacementRotation += angleDelta;
+                    Segment.Rotation += angleDelta;
                     break;
             }
             dragStartPosition = dragEndPosition;
-            Segment.Position = editorSegment.PlacementPosition;
-            Segment.Rotation = editorSegment.PlacementRotation;
-            Segment.Scale = editorSegment.PlacementScale;
+            
         }
 
         protected override void DrawBackground(DrawContext drawContext, float actualOpacity)

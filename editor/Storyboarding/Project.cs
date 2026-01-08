@@ -687,7 +687,7 @@ namespace StorybrewEditor.Storyboarding
                 // Write each effect
                 foreach (var effect in effects)
                 {
-                    WriteTiny(effect, directoryWriter);
+                    WriteEffectTiny(effect, directoryWriter);
                 }
 
                 directoryWriter.Commit(checkPaths: true);
@@ -824,8 +824,6 @@ namespace StorybrewEditor.Storyboarding
             TinyArray potentialTokens = currentToken.Value<TinyArray>("Children");
             if (potentialTokens == null || potentialTokens.Count == 0) return;
 
-            //Dictionary<string, TinyToken> tokens = potentialTokens
-            //                                            .ToDictionary((tiny) => tiny.Value<string>("Name"));
 
             foreach (TinyToken token in potentialTokens)
             {
@@ -841,7 +839,7 @@ namespace StorybrewEditor.Storyboarding
         /// </summary>
         /// <param name="effect"></param>
         /// <param name="directoryWriter"></param>
-        void WriteTiny(Effect effect, SafeDirectoryWriter directoryWriter)
+        void WriteEffectTiny(Effect effect, SafeDirectoryWriter directoryWriter)
         {
             var effectRoot = new TinyObject
                     {
@@ -882,7 +880,6 @@ namespace StorybrewEditor.Storyboarding
 
             foreach (var layer in LayerManager.Layers.Where(l => l.Effect == effect))
             {
-                var childTinyObject = GetChildSegmentTiny(layer);
                 //Debug.Assert(childTinyObject != null);
                 var layerRoot =  GetLayerTiny(layer);
 
