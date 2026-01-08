@@ -27,7 +27,7 @@ namespace StorybrewEditor.UserInterface.Drawables
         private float scaleFactor;
         private Vector2 offset;
 
-        private PlacementUi ui;
+        private readonly PlacementUi ui;
 
         internal PlacementDrawable(PlacementUi ui) : base()
         {
