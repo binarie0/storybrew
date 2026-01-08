@@ -36,9 +36,11 @@ namespace StorybrewEditor.UserInterface.Components
 
         private PlacementDrawable placementDrawable;
 
+        internal PlacementUIState GetState() => state;
+
         public PlacementUi(WidgetManager manager) : base(manager)
         {
-            placementDrawable = new PlacementDrawable();
+            placementDrawable = new PlacementDrawable(this);
 
             OnClickDown += placementUi_OnClickDown;
             OnClickUp += placementUi_onClickUp;
@@ -58,7 +60,7 @@ namespace StorybrewEditor.UserInterface.Components
         }
 
         private Vector2 dragStartPosition;
-        private State state = State.Idle;
+        private PlacementUIState state = PlacementUIState.Idle;
         private bool placementUi_OnClickDown(WidgetEvent evt, MouseButtonEventArgs e)
         {
             if (e.Button == MouseButton.Left)
@@ -67,22 +69,22 @@ namespace StorybrewEditor.UserInterface.Components
                 dragStartPosition = new Vector2(e.X, e.Y);
                 var keyboardState = Keyboard.GetState();
                 if (keyboardState.IsKeyDown(Key.ShiftLeft))
-                    state = State.Scaling;
+                    state = PlacementUIState.Scaling;
                 else if (keyboardState.IsKeyDown(Key.ControlLeft))
-                    state = State.Rotating;
-                else state = State.Moving;
+                    state = PlacementUIState.Rotating;
+                else state = PlacementUIState.Moving;
                 return true;
             }
             return false;
         }
         private void placementUi_onClickUp(WidgetEvent evt, MouseButtonEventArgs e)
         {
-            state = State.Idle;
+            state = PlacementUIState.Idle;
             //editorSegment = null;
         }
         private void placementUi_onClickMove(WidgetEvent evt, MouseMoveEventArgs e)
         {
-            if (state == State.Idle)
+            if (state == PlacementUIState.Idle)
                 return;
 
             Debug.Assert(e.XDelta != 0 || e.YDelta != 0);
@@ -97,11 +99,11 @@ namespace StorybrewEditor.UserInterface.Components
 
             switch (state)
             {
-                case State.Moving:
+                case PlacementUIState.Moving:
                     Segment.Position += deltaSegment;
                     //editorSegment.PlacementPosition += deltaSegment;
                     break;
-                case State.Scaling:
+                case PlacementUIState.Scaling:
                     var oldScale = Segment.Scale;
                     //editorSegment.PlacementScale *= dragTo.Length / dragFrom.Length;
                     Segment.Scale *= dragTo.Length / dragFrom.Length;
@@ -111,7 +113,7 @@ namespace StorybrewEditor.UserInterface.Components
                         Segment.Scale = oldScale;
                     }
                     break;
-                case State.Rotating:
+                case PlacementUIState.Rotating:
                     var fromAngle = Math.Atan2(dragFrom.Y, dragFrom.X);
                     var toAngle = Math.Atan2(dragTo.Y, dragTo.X);
                     var angleDelta = toAngle - fromAngle;
@@ -130,7 +132,7 @@ namespace StorybrewEditor.UserInterface.Components
                 placementDrawable.Draw(drawContext, Manager.Camera, Bounds, actualOpacity);
         }
 
-        private enum State
+        internal enum PlacementUIState
         {
             Idle,
             Moving,

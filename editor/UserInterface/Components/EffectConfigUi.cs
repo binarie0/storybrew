@@ -208,6 +208,14 @@ namespace StorybrewEditor.UserInterface.Components
                 AnchorFrom = BoxAlignment.Centre,
                 AnchorTo = BoxAlignment.Centre,
             });
+
+            configFieldsLayout.Add(new Label(Manager)
+            {
+                StyleName = "listItem",
+                Text = "Left Click: Move\nShift + Left Click: Scale\nCTRL + Left Click: Rotate",
+                AnchorFrom = BoxAlignment.Centre,
+                AnchorTo = BoxAlignment.Centre,
+            });
             foreach (var layer in effect.Project.LayerManager.Layers.Where(l => l.Effect == effect))
                 buildSegmentEditor(layer);
         }
@@ -228,7 +236,7 @@ namespace StorybrewEditor.UserInterface.Components
                     {
                         StyleName = "icon",
                         Icon = IconFont.Arrows,
-                        Tooltip = "Move",
+                        Tooltip = "Edit Transform",
                         AnchorFrom = BoxAlignment.Centre,
                         AnchorTo = BoxAlignment.Centre,
                         CanGrow = false,
@@ -239,7 +247,7 @@ namespace StorybrewEditor.UserInterface.Components
                         Text = new string(' ', depth * 2) + (string.IsNullOrWhiteSpace(segment.Identifier) ? "(Unnamed)": segment.Identifier),
                         AnchorFrom = BoxAlignment.TopLeft,
                         AnchorTo = BoxAlignment.TopLeft,
-                        Tooltip = $"Segment {segment.Identifier}",
+                        Tooltip = $"Segment - {segment.Identifier}",
                     },
                 },
             });

@@ -6,6 +6,8 @@ using OpenTK;
 using OpenTK.Graphics;
 using StorybrewCommon.Storyboarding;
 using StorybrewEditor.Storyboarding;
+using StorybrewEditor.UserInterface.Components;
+using System.Diagnostics;
 
 namespace StorybrewEditor.UserInterface.Drawables
 {
@@ -25,6 +27,13 @@ namespace StorybrewEditor.UserInterface.Drawables
         private float scaleFactor;
         private Vector2 offset;
 
+        private PlacementUi ui;
+
+        internal PlacementDrawable(PlacementUi ui) : base()
+        {
+            this.ui = ui;
+        }
+
         public void Draw(DrawContext drawContext, Camera camera, Box2 bounds, float opacity = 1)
         {
             transform = Segment.BuildTransform(ParentTransform);
@@ -36,7 +45,9 @@ namespace StorybrewEditor.UserInterface.Drawables
             var left = StoryboardToScreen(transform.ApplyToPosition(Vector2.UnitX * -10000));
             var right = StoryboardToScreen(transform.ApplyToPosition(Vector2.UnitX * 10000));
 
-            var positionOffset = PreferredSize * 0.5f;
+            var positionOffset = new Vector2(bounds.Width, bounds.Height)*0.5f;
+            //Debug.WriteLine(positionOffset);
+
             center += positionOffset;
             top += positionOffset;
             bottom += positionOffset;
@@ -50,7 +61,19 @@ namespace StorybrewEditor.UserInterface.Drawables
             renderer.Draw(new Vector3(top + Vector2.One), new Vector3(bottom + Vector2.One), Color4.Black);
             renderer.Draw(new Vector3(left + Vector2.One), new Vector3(right + Vector2.One), Color4.Black);
 
-            renderer.DrawCircle(center, RingDistance, Color4.Blue);
+            Color4 DrawColor = Color4.Blue;
+            switch (ui.GetState())
+            {
+                case PlacementUi.PlacementUIState.Scaling:
+                    DrawColor = Color4.Green;
+                    break;
+                case PlacementUi.PlacementUIState.Rotating:
+                    DrawColor = Color4.Red;
+                    break;
+                default:break;
+            }
+           
+            renderer.DrawCircle(center, RingDistance, DrawColor);
             renderer.Draw(new Vector3(top), new Vector3(bottom), Color4.Blue);
             renderer.Draw(new Vector3(left), new Vector3(right), Color4.Blue);
         }
