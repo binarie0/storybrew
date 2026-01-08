@@ -775,16 +775,20 @@ namespace StorybrewEditor.Storyboarding
 
                         var transformRoot = layerRoot.Value<TinyObject>("Transform");
                         EditorStoryboardLayer placeholderLayer = null;
-                        layerInserters.Add(layerGuid, () => layerEffect.AddPlaceholder(placeholderLayer = new EditorStoryboardLayer(layerRoot.Value<string>("Name"), layerEffect)
+                        layerInserters.Add(layerGuid, () =>
                         {
-                            Guid = Guid.Parse(layerGuid),
-                            OsbLayer = layerRoot.Value<OsbLayer>("OsbLayer"),
-                            DiffSpecific = layerRoot.Value<bool>("DiffSpecific"),
-                            Visible = layerRoot.Value<bool>("Visible"),
-                            Position = FromString(transformRoot.Value<string>("Offset")),
-                            Rotation = transformRoot.Value<float>("Rotation"),
-                            Scale = transformRoot.Value<float>("Scale"),
-                        }));
+                            layerEffect.AddPlaceholder(placeholderLayer = new EditorStoryboardLayer(layerRoot.Value<string>("Name"), layerEffect)
+                            {
+                                Guid = Guid.Parse(layerGuid),
+                                OsbLayer = layerRoot.Value<OsbLayer>("OsbLayer"),
+                                DiffSpecific = layerRoot.Value<bool>("DiffSpecific"),
+                                Visible = layerRoot.Value<bool>("Visible")
+                            });
+
+                            Cascade(placeholderLayer, transformRoot);
+                        }
+
+                        );
 
                         
                     }
@@ -809,6 +813,27 @@ namespace StorybrewEditor.Storyboarding
                     insertLayer();
                 }
             }
+        }
+
+        void Cascade(StoryboardSegment segment, TinyObject currentToken)
+        {
+            segment.Position = VectorFromString(currentToken.Value<string>("Offset"));
+            segment.Rotation = currentToken.Value<float>("Rotation");
+            segment.Scale = currentToken.Value<float>("Scale");
+
+            TinyArray potentialTokens = currentToken.Value<TinyArray>("Children");
+            if (potentialTokens == null || potentialTokens.Count == 0) return;
+
+            //Dictionary<string, TinyToken> tokens = potentialTokens
+            //                                            .ToDictionary((tiny) => tiny.Value<string>("Name"));
+
+            foreach (TinyToken token in potentialTokens)
+            {
+                TinyObject obj = (TinyObject)token;
+                StoryboardSegment nextSegment = segment.GetSegment(obj.Value<string>("Name"));
+                Cascade(nextSegment, obj);
+            }
+            
         }
 
         /// <summary>
@@ -901,7 +926,7 @@ namespace StorybrewEditor.Storyboarding
         }
 
 
-        Vector2 FromString(string value)
+        Vector2 VectorFromString(string value)
         {
             string[] spl = value.Split(',', StringSplitOptions.TrimEntries);
             foreach (string s in spl) Debug.WriteLine(s);

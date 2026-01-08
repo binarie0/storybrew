@@ -6,6 +6,7 @@ using StorybrewCommon.Storyboarding;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace StorybrewEditor.Storyboarding
 {
@@ -180,6 +181,24 @@ namespace StorybrewEditor.Storyboarding
             DiffSpecific = other.DiffSpecific;
             OsbLayer = other.OsbLayer;
             Visible = other.Visible;
+
+            CopyTransforms(this, other);
+        }
+
+        void CopyTransforms(StoryboardSegment to, StoryboardSegment from)
+        {
+            to.Position = from.Position;
+            to.Rotation = from.Rotation;
+            to.Scale = from.Scale;
+
+            //in theory this is supposed to not be set
+            if (!from.NamedSegments.Any()) return;
+
+            foreach (StoryboardSegment fromSegment in from.NamedSegments)
+            {
+                CopyTransforms(to.GetSegment(fromSegment.Identifier), fromSegment);
+            }
+
         }
 
         public int CompareTo(EditorStoryboardLayer other)
