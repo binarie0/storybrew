@@ -237,11 +237,11 @@ namespace StorybrewEditor.Storyboarding
             displayableBuckets = null;
         }
 
-        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer osbLayer, StoryboardTransform transform)
+        public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer osbLayer, StoryboardTransform localTransform)
         {
-            var localTransform = this.BuildTransform(transform);
+            StoryboardTransform thisTransform = this.BuildTransform(localTransform);
             foreach (var sbo in storyboardObjects)
-                sbo.WriteOsb(writer, exportSettings, osbLayer, localTransform);
+                sbo.WriteOsb(writer, exportSettings, osbLayer, thisTransform);
         }
 
         public int CalculateSize(OsbLayer osbLayer)

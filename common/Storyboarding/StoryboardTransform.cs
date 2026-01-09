@@ -16,6 +16,8 @@ namespace StorybrewCommon.Storyboarding
         private readonly float transformScale;
         private readonly double transformAngle;
 
+        public bool IsIdentity => !Rotates && !Scales && !Translates;
+
         public bool Rotates => transformAngle != 0;
         public bool Scales => transformScale != 1;
         public bool Translates => transform != Affine2.Identity;
@@ -97,5 +99,13 @@ namespace StorybrewCommon.Storyboarding
 
         public Vector2 ApplyToScale(Vector2 value)
             => value * transformScale;
+    }
+
+    public class TransformException : Exception
+    {
+        internal TransformException(string message) : base(message)
+        {
+
+        }
     }
 }

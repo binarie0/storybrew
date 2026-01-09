@@ -150,7 +150,7 @@ namespace StorybrewEditor.Storyboarding
             if (!Visible)
                 return;
 
-            segment.Draw(drawContext, camera, bounds, opacity, null, Effect.Project, frameStats);
+            segment.Draw(drawContext, camera, bounds, opacity, this.BuildCompleteParentTransform(), Effect.Project, frameStats);
         }
 
         public void PostProcess()
@@ -169,7 +169,7 @@ namespace StorybrewEditor.Storyboarding
         }
 
         public void WriteOsb(TextWriter writer, ExportSettings exportSettings)
-            => WriteOsb(writer, exportSettings, osbLayer, null);
+            => WriteOsb(writer, exportSettings, osbLayer, InternalSegment.BuildCompleteParentTransform());
 
         public override void WriteOsb(TextWriter writer, ExportSettings exportSettings, OsbLayer layer, StoryboardTransform transform) 
             => segment.WriteOsb(writer, exportSettings, osbLayer, transform);
@@ -187,6 +187,7 @@ namespace StorybrewEditor.Storyboarding
 
         void CopyTransforms(StoryboardSegment to, StoryboardSegment from)
         {
+            
             to.Position = from.Position;
             to.Rotation = from.Rotation;
             to.Scale = from.Scale;

@@ -25,9 +25,6 @@ namespace StorybrewEditor.Storyboarding
                 //,
                 //editorSegment.PlacementPosition, editorSegment.PlacementRotation, (float)editorSegment.PlacementScale);
         }
-        public static StoryboardTransform BuildTransformWithoutPlacement(this StoryboardSegment segment, StoryboardTransform parentTransform)
-            => new StoryboardTransform(parentTransform, segment.Origin, segment.Position, segment.Rotation, (float)segment.Scale
-                //, Vector2.Zero, 0, 1
-                );
+
     }
 }

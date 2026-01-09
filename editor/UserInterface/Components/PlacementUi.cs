@@ -56,6 +56,19 @@ namespace StorybrewEditor.UserInterface.Components
             
         }
 
+        public void ResetState()
+        {
+            TransformInfo info = new TransformInfo()
+            {
+               Position = Vector2.Zero,
+               Rotation = 0,
+               Scale = 1
+            };
+
+            ApplyTransform(info);
+            UndoStack.Push(info);
+        }
+
         bool redoing = false;
 
         private readonly Stack<TransformInfo> UndoStack = new Stack<TransformInfo>();
@@ -80,7 +93,10 @@ namespace StorybrewEditor.UserInterface.Components
                 case Key.R:
                     {
                         if (!activeChanges)
+                        {
+                            rotationVector = Vector2.Zero;
                             transformType = PlacementUITransformType.Rotate;
+                        }
                         return true;
                     }
                 case Key.Z:
@@ -193,6 +209,7 @@ namespace StorybrewEditor.UserInterface.Components
                     case PlacementUITransformType.Rotate:
                         if (top.Rotation == Segment.Rotation)
                             return;
+                        
                         break;
 
                     case PlacementUITransformType.Scale:
@@ -267,8 +284,11 @@ namespace StorybrewEditor.UserInterface.Components
             if (placementDrawable.Segment != null)
                 placementDrawable.Draw(drawContext, Manager.Camera, Bounds, actualOpacity);
 
-            var renderer = DrawState.Prepare(drawContext.Get<LineRenderer>(), Manager.Camera, linesRenderStates);
-            renderer.Draw(new Vector3(placementDrawable.Center), new Vector3(placementDrawable.Center+ rotationVector), Color4.Yellow);
+            if (transformType == PlacementUITransformType.Rotate)
+            {
+                var renderer = DrawState.Prepare(drawContext.Get<LineRenderer>(), Manager.Camera, linesRenderStates);
+                renderer.Draw(new Vector3(placementDrawable.Center), new Vector3(placementDrawable.Center+ rotationVector), Color4.Yellow);
+            }
         }
 
         internal enum PlacementUIState

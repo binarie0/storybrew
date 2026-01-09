@@ -344,7 +344,8 @@ namespace StorybrewCommon.Storyboarding
             //set up defaults for the timeline
             if (transform != null)
             {
-                if (transform.Rotates && !rotateTimeline.HasCommands)
+                //if no default has been set for these commands, make sure to add one
+                if (transform.Rotates && !rotateTimeline.HasCommands && !LockRotationOnTransform)
                 {
                     Rotate(StartTime, 0);
                 }
