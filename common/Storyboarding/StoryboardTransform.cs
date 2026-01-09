@@ -18,6 +18,7 @@ namespace StorybrewCommon.Storyboarding
 
         public bool Rotates => transformAngle != 0;
         public bool Scales => transformScale != 1;
+        public bool Translates => transform != Affine2.Identity;
 
         public StoryboardTransform(StoryboardTransform parent,
             Vector2 origin, Vector2 position, double rotation, float scale

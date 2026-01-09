@@ -341,6 +341,29 @@ namespace StorybrewCommon.Storyboarding
         {
             if (CommandCount == 0)
                 return;
+            //set up defaults for the timeline
+            if (transform != null)
+            {
+                if (transform.Rotates && !rotateTimeline.HasCommands)
+                {
+                    Rotate(StartTime, 0);
+                }
+
+                if (transform.Scales &&
+                    (!scaleTimeline.HasCommands &&
+                    scaleVecTimeline.HasCommands))
+                {
+                    Scale(StartTime, ScaleAt(StartTime).X);
+                }
+
+                if (transform.Translates &&
+                    (!moveTimeline.HasCommands &&
+                    !moveXTimeline.HasCommands &&
+                    !moveYTimeline.HasCommands))
+                {
+                    Move(StartTime, DefaultPosition);
+                }
+            }
 
             var osbSpriteWriter = OsbWriterFactory.CreateWriter(this, moveTimeline,
                                                                       moveXTimeline,

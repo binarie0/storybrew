@@ -217,7 +217,8 @@ namespace StorybrewEditor.UserInterface.Components
                 return;
             
             Debug.Assert(e.XDelta != 0 || e.YDelta != 0);
-            mousePosition = new Vector2(e.X, e.Y);
+
+            mousePosition = placementDrawable.StoryboardToScreen(new Vector2(e.X, e.Y));
             Vector2 mouseDelta = new Vector2(e.XDelta, e.YDelta);
             var dragEndPosition = dragStartPosition + mouseDelta;
             var dragFrom = placementDrawable.ScreenToSegment(dragStartPosition);
