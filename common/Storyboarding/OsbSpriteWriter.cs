@@ -98,7 +98,7 @@ namespace StorybrewCommon.Storyboarding
                 sprite.HasMoveXYCommands ? 
                     transform.ApplyToPositionXY(sprite.InitialPosition) : 
                     transform.ApplyToPosition(sprite.InitialPosition);
-
+            
             if (!moveTimeline.HasCommands && !moveXTimeline.HasCommands)
                 TextWriter.Write($",{transformedInitialPosition.X.ToString(ExportSettings.NumberFormat)}");
             else TextWriter.Write($",0");

@@ -7,7 +7,9 @@ namespace StorybrewCommon.Storyboarding
 {
     public class StoryboardTransform
     {
-        public readonly static StoryboardTransform Identity = new StoryboardTransform(null, Vector2.Zero, Vector2.Zero, 0, 1, Vector2.Zero, 0, 1);
+        public readonly static StoryboardTransform Identity = new StoryboardTransform(null, Vector2.Zero, Vector2.Zero, 0, 1
+            //, Vector2.Zero, 0, 1
+            );
 
         private readonly Affine2 transform;
         private readonly Affine2 inverseTransform;
@@ -18,8 +20,9 @@ namespace StorybrewCommon.Storyboarding
         public bool Scales => transformScale != 1;
 
         public StoryboardTransform(StoryboardTransform parent,
-            Vector2 origin, Vector2 position, double rotation, float scale,
-            Vector2 placementPosition, double placementRotation, float placementScale)
+            Vector2 origin, Vector2 position, double rotation, float scale
+            //,Vector2 placementPosition, double placementRotation, float placementScale
+            )
         {
             transform = parent?.transform ?? Affine2.Identity;
             inverseTransform = parent?.inverseTransform ?? Affine2.Identity;
@@ -39,21 +42,21 @@ namespace StorybrewCommon.Storyboarding
                 inverseTransform.ScaleInverse(1 / scale, 1 / scale);
             }
 
-            if (placementPosition != Vector2.Zero)
-            {
-                transform.Translate(placementPosition.X, placementPosition.Y);
-                inverseTransform.TranslateInverse(-placementPosition.X, -placementPosition.Y);
-            }
-            if (placementRotation != 0)
-            {
-                transform.Rotate((float)placementRotation);
-                inverseTransform.RotateInverse(-(float)placementRotation);
-            }
-            if (placementScale != 1)
-            {
-                transform.Scale(placementScale, placementScale);
-                inverseTransform.ScaleInverse(1 / placementScale, 1 / placementScale);
-            }
+            //if (placementPosition != Vector2.Zero)
+            //{
+            //    transform.Translate(placementPosition.X, placementPosition.Y);
+            //    inverseTransform.TranslateInverse(-placementPosition.X, -placementPosition.Y);
+            //}
+            //if (placementRotation != 0)
+            //{
+            //    transform.Rotate((float)placementRotation);
+            //    inverseTransform.RotateInverse(-(float)placementRotation);
+            //}
+            //if (placementScale != 1)
+            //{
+            //    transform.Scale(placementScale, placementScale);
+            //    inverseTransform.ScaleInverse(1 / placementScale, 1 / placementScale);
+            //}
 
             if (origin != Vector2.Zero)
             {
@@ -61,7 +64,9 @@ namespace StorybrewCommon.Storyboarding
                 inverseTransform.TranslateInverse(origin.X, origin.Y);
             }
 
-            transformScale = (parent?.transformScale ?? 1) * scale * placementScale;
+            transformScale = (parent?.transformScale ?? 1) * scale
+                //* placementScale
+                ;
 
             
             // https://math.stackexchange.com/questions/13150/extracting-rotation-scale-values-from-2d-transformation-matrix/13165#13165

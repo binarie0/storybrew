@@ -247,7 +247,7 @@ namespace StorybrewEditor.UserInterface.Components
                     break;
                 case PlacementUITransformType.Rotate:
                     //calculate something here man idk
-                    rotationVector = placementDrawable.StoryboardToScreen(placementDrawable.Center) - mousePosition;
+                    rotationVector = mousePosition - placementDrawable.Center;
 
                     var norm_rotVec = rotationVector.Normalized();
                     //offsetVector.X - cos
