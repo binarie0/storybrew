@@ -56,9 +56,10 @@ namespace StorybrewEditor.UserInterface.Components
             
         }
 
-        
+        bool redoing = false;
 
         private readonly Stack<TransformInfo> UndoStack = new Stack<TransformInfo>();
+        private readonly Stack<TransformInfo> RedoStack = new Stack<TransformInfo>();
 
         private bool placementUi_OnKeyDown(WidgetEvent evt, KeyboardKeyEventArgs e)
         {
@@ -83,20 +84,53 @@ namespace StorybrewEditor.UserInterface.Components
                         return true;
                     }
                 case Key.Z:
-                    if (!e.IsRepeat && e.Control && UndoStack.Count != 0)
+                    if (!e.IsRepeat && e.Control)
                     {
-                        
-                        TransformInfo last = UndoStack.Pop();
-                        Segment.Position = last.Position;
-                        Segment.Rotation = last.Rotation;
-                        Segment.Scale = last.Scale;
+                        if (e.Shift && RedoStack.Count > 0)
+                        {
+                            RedoTransform();
+                            return true;
+                        }
+
+                        if (!e.Shift && UndoStack.Count > 0)
+                            UndoTransform();
                     }
                     return true;
 
+                case Key.Y:
+                    if (!e.IsRepeat && e.Control && RedoStack.Count > 0)
+                    {
+                        RedoTransform();
+                    }
+                    return true;
                 default: return false;
             }
         }
 
+        void ApplyTransform(TransformInfo info)
+        {
+            Segment.Position = info.Position;
+            Segment.Rotation = info.Rotation;
+            Segment.Scale = info.Scale;
+        }
+        void UndoTransform()
+        {
+            TransformInfo info = UndoStack.Pop();
+            ApplyTransform(info);
+
+            RedoStack.Push(info);
+            redoing = false;
+        }
+        void RedoTransform()
+        {
+            TransformInfo info = RedoStack.Pop();
+            if (!redoing) info = RedoStack.Pop();
+
+            ApplyTransform(info);
+
+            UndoStack.Push(info);
+            redoing = true;
+        }
 
         protected override void Dispose(bool disposing)
         {
@@ -132,11 +166,22 @@ namespace StorybrewEditor.UserInterface.Components
             }
             return false;
         }
+        private TransformInfo GetCurrentInfo()
+        {
+            return new TransformInfo()
+            {
+                Position = Segment.Position,
+                Rotation = Segment.Rotation,
+                Scale = Segment.Scale
+            };
+        }
 
+        
         private void LogChange()
         {
             if (UndoStack.Count > 0)
             {
+                //ensure value was unique compared to the one before it.
                 TransformInfo top = UndoStack.Peek();
                 switch (transformType)
                 {
@@ -156,21 +201,15 @@ namespace StorybrewEditor.UserInterface.Components
                         break;
                 }
             }
-            UndoStack.Push(new TransformInfo()
-            {
-                Position = Segment.Position,
-                Rotation = Segment.Rotation,
-                Scale = Segment.Scale
-            });
+            UndoStack.Push(GetCurrentInfo());
+
+            RedoStack.Clear();
             
         }
         private void placementUi_onClickUp(WidgetEvent evt, MouseButtonEventArgs e)
         {
             state = PlacementUIState.Idle;
-            
-            //editorSegment = null;
-            
-
+            RedoStack.Push(GetCurrentInfo());
         }
         private void placementUi_onClickMove(WidgetEvent evt, MouseMoveEventArgs e)
         {
@@ -245,6 +284,16 @@ namespace StorybrewEditor.UserInterface.Components
             internal Vector2 Position;
             internal double Rotation;
             internal double Scale;
+
+            public override bool Equals(object obj)
+            {
+                return obj is TransformInfo i && GetHashCode() == i.GetHashCode();
+            }
+
+            public override int GetHashCode()
+            {
+                return Position.GetHashCode() ^ Rotation.GetHashCode() ^ Scale.GetHashCode();
+            }
         }
     }
 }

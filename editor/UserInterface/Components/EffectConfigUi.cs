@@ -212,7 +212,7 @@ namespace StorybrewEditor.UserInterface.Components
             configFieldsLayout.Add(new Label(Manager)
             {
                 StyleName = "listItem",
-                Text = "W: Move\nE: Scale\nR: Rotate",
+                Text = "- W: Move\n- E: Scale\n- R: Rotate\n- CTRL + Z: Undo\n- CTRL + Shift + Z OR CTRL + Y: Redo",
                 AnchorFrom = BoxAlignment.Centre,
                 AnchorTo = BoxAlignment.Centre,
             });
