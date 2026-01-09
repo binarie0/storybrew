@@ -1,12 +1,15 @@
 ﻿using BrewLib.Graphics;
+using BrewLib.Graphics.Renderers;
 using BrewLib.UserInterface;
 using BrewLib.Util;
 using OpenTK;
+using OpenTK.Graphics;
 using OpenTK.Input;
 using StorybrewCommon.Storyboarding;
 using StorybrewEditor.Storyboarding;
 using StorybrewEditor.UserInterface.Drawables;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace StorybrewEditor.UserInterface.Components
@@ -36,59 +39,146 @@ namespace StorybrewEditor.UserInterface.Components
 
         private PlacementDrawable placementDrawable;
 
-        internal PlacementUIState GetState() => state;
+        private readonly RenderStates linesRenderStates = new RenderStates();
+
+        internal PlacementUITransformType GetTransformType() => transformType;
+
+        private Vector2 mousePosition;
 
         public PlacementUi(WidgetManager manager) : base(manager)
         {
             placementDrawable = new PlacementDrawable(this);
 
+            OnKeyDown += placementUi_OnKeyDown;
             OnClickDown += placementUi_OnClickDown;
             OnClickUp += placementUi_onClickUp;
             OnClickMove += placementUi_onClickMove;
+            
         }
+
+        
+
+        private readonly Stack<TransformInfo> UndoStack = new Stack<TransformInfo>();
+
+        private bool placementUi_OnKeyDown(WidgetEvent evt, KeyboardKeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.W:
+                    {
+                        if (!activeChanges)
+                            transformType = PlacementUITransformType.Move;
+                        return true;
+                    }
+                case Key.E:
+                    {
+                        if (!activeChanges)
+                            transformType = PlacementUITransformType.Scale;
+                        return true;
+                    }
+                case Key.R:
+                    {
+                        if (!activeChanges)
+                            transformType = PlacementUITransformType.Rotate;
+                        return true;
+                    }
+                case Key.Z:
+                    if (!e.IsRepeat && e.Control && UndoStack.Count != 0)
+                    {
+                        
+                        TransformInfo last = UndoStack.Pop();
+                        Segment.Position = last.Position;
+                        Segment.Rotation = last.Rotation;
+                        Segment.Scale = last.Scale;
+                    }
+                    return true;
+
+                default: return false;
+            }
+        }
+
 
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
             if (disposing)
             {
+                
                 OnClickDown -= placementUi_OnClickDown;
                 OnClickUp -= placementUi_onClickUp;
                 OnClickMove -= placementUi_onClickMove;
+                OnKeyDown -= placementUi_OnKeyDown;
             }
             placementDrawable = null;
         }
 
         private Vector2 dragStartPosition;
+
+        private bool activeChanges = false;
+        private Vector2 rotationVector;
         private PlacementUIState state = PlacementUIState.Idle;
+        private PlacementUITransformType transformType;
+
+        
         private bool placementUi_OnClickDown(WidgetEvent evt, MouseButtonEventArgs e)
         {
             if (e.Button == MouseButton.Left)
             {
                 //editorSegment = Segment.AsEditorSegment();
                 dragStartPosition = new Vector2(e.X, e.Y);
-                var keyboardState = Keyboard.GetState();
-                if (keyboardState.IsKeyDown(Key.ShiftLeft))
-                    state = PlacementUIState.Scaling;
-                else if (keyboardState.IsKeyDown(Key.ControlLeft))
-                    state = PlacementUIState.Rotating;
-                else state = PlacementUIState.Moving;
+                state = PlacementUIState.Doing;
+                LogChange();
                 return true;
             }
             return false;
         }
+
+        private void LogChange()
+        {
+            if (UndoStack.Count > 0)
+            {
+                TransformInfo top = UndoStack.Peek();
+                switch (transformType)
+                {
+                    case PlacementUITransformType.Move:
+                        if (top.Position == Segment.Position)
+                            return;
+                        break;
+
+                    case PlacementUITransformType.Rotate:
+                        if (top.Rotation == Segment.Rotation)
+                            return;
+                        break;
+
+                    case PlacementUITransformType.Scale:
+                        if (top.Scale == Segment.Scale) 
+                            return;
+                        break;
+                }
+            }
+            UndoStack.Push(new TransformInfo()
+            {
+                Position = Segment.Position,
+                Rotation = Segment.Rotation,
+                Scale = Segment.Scale
+            });
+            
+        }
         private void placementUi_onClickUp(WidgetEvent evt, MouseButtonEventArgs e)
         {
             state = PlacementUIState.Idle;
+            
             //editorSegment = null;
+            
+
         }
         private void placementUi_onClickMove(WidgetEvent evt, MouseMoveEventArgs e)
         {
             if (state == PlacementUIState.Idle)
                 return;
-
+            
             Debug.Assert(e.XDelta != 0 || e.YDelta != 0);
-
+            mousePosition = new Vector2(e.X, e.Y);
             Vector2 mouseDelta = new Vector2(e.XDelta, e.YDelta);
             var dragEndPosition = dragStartPosition + mouseDelta;
             var dragFrom = placementDrawable.ScreenToSegment(dragStartPosition);
@@ -97,28 +187,33 @@ namespace StorybrewEditor.UserInterface.Components
             var deltaSegment = dragTo - dragFrom;
             //Debug.Assert(dragFrom != dragTo);
 
-            switch (state)
+            switch (transformType)
             {
-                case PlacementUIState.Moving:
-                    Segment.Position += deltaSegment;
+                case PlacementUITransformType.Move:
+                    Segment.Position += mouseDelta;
                     //editorSegment.PlacementPosition += deltaSegment;
                     break;
-                case PlacementUIState.Scaling:
+                case PlacementUITransformType.Scale:
                     var oldScale = Segment.Scale;
                     //editorSegment.PlacementScale *= dragTo.Length / dragFrom.Length;
-                    Segment.Scale *= dragTo.Length / dragFrom.Length;
+                    float dScale = dragTo.Length / dragFrom.Length;
+                    Segment.Scale *= dScale;
+                    
                     if (Segment.Scale == 0)
                     {
                         //editorSegment.PlacementScale = oldScale;
                         Segment.Scale = oldScale;
                     }
+
                     break;
-                case PlacementUIState.Rotating:
-                    var fromAngle = Math.Atan2(dragFrom.Y, dragFrom.X);
-                    var toAngle = Math.Atan2(dragTo.Y, dragTo.X);
-                    var angleDelta = toAngle - fromAngle;
-                    //editorSegment.PlacementRotation += angleDelta;
-                    Segment.Rotation += angleDelta;
+                case PlacementUITransformType.Rotate:
+                    //calculate something here man idk
+                    rotationVector = placementDrawable.ScreenToSegment(mousePosition) - placementDrawable.Offset;
+                    rotationVector.Normalize();
+                    //offsetVector.X - cos
+                    //offsetVector.Y - sin
+                    Segment.Rotation = Math.Atan2(rotationVector.Y, rotationVector.X);
+                    
                     break;
             }
             dragStartPosition = dragEndPosition;
@@ -130,14 +225,26 @@ namespace StorybrewEditor.UserInterface.Components
             base.DrawBackground(drawContext, actualOpacity);
             if (placementDrawable.Segment != null)
                 placementDrawable.Draw(drawContext, Manager.Camera, Bounds, actualOpacity);
+
+            var renderer = DrawState.Prepare(drawContext.Get<LineRenderer>(), Manager.Camera, linesRenderStates);
+            renderer.Draw(new Vector3(Segment.Position), new Vector3(Segment.Position + rotationVector * 10), Color4.Yellow);
         }
 
         internal enum PlacementUIState
         {
-            Idle,
-            Moving,
-            Scaling,
-            Rotating,
+            Idle, Doing
+        }
+
+        internal enum PlacementUITransformType
+        {
+            Move, Scale, Rotate
+        }
+
+        private class TransformInfo
+        {
+            internal Vector2 Position;
+            internal double Rotation;
+            internal double Scale;
         }
     }
 }

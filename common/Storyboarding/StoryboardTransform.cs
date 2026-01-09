@@ -14,6 +14,9 @@ namespace StorybrewCommon.Storyboarding
         private readonly float transformScale;
         private readonly double transformAngle;
 
+        public bool Rotates => transformAngle != 0;
+        public bool Scales => transformScale != 1;
+
         public StoryboardTransform(StoryboardTransform parent,
             Vector2 origin, Vector2 position, double rotation, float scale,
             Vector2 placementPosition, double placementRotation, float placementScale)
@@ -60,6 +63,7 @@ namespace StorybrewCommon.Storyboarding
 
             transformScale = (parent?.transformScale ?? 1) * scale * placementScale;
 
+            
             // https://math.stackexchange.com/questions/13150/extracting-rotation-scale-values-from-2d-transformation-matrix/13165#13165
             transformAngle = Math.Atan2(-transform.M21, transform.M11); // OR Math.Atan2(-transform.M22, transform.M12);
         }

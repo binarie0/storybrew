@@ -77,6 +77,7 @@ namespace StorybrewCommon.Storyboarding
         public bool HasScalingCommands => scaleTimeline.HasCommands || scaleVecTimeline.HasCommands;
         public bool HasMoveXYCommands => moveXTimeline.HasCommands || moveYTimeline.HasCommands;
 
+        public bool LockRotationOnTransform { get; set; } = false;
         private double commandsStartTime = double.MaxValue;
         public double CommandsStartTime
         {

@@ -27,6 +27,8 @@ namespace StorybrewEditor.UserInterface.Drawables
         private float scaleFactor;
         private Vector2 offset;
 
+        internal Vector2 Offset => offset;
+
         private readonly PlacementUi ui;
 
         internal PlacementDrawable(PlacementUi ui) : base()
@@ -38,21 +40,21 @@ namespace StorybrewEditor.UserInterface.Drawables
         {
             transform = Segment.BuildTransform(ParentTransform);
             scaleFactor = bounds.Height / 480;
-            offset = new Vector2(bounds.Left + bounds.Width * 0.5f - 320 * scaleFactor, bounds.Top);
+            offset = new Vector2(bounds.Left + bounds.Width * 0.5f - 320 * scaleFactor, bounds.Top + bounds.Height * 0.5f - 240 * scaleFactor);
             var center = StoryboardToScreen(transform.ApplyToPosition(Vector2.Zero));
             var top = StoryboardToScreen(transform.ApplyToPosition(Vector2.UnitY * -10000));
             var bottom = StoryboardToScreen(transform.ApplyToPosition(Vector2.UnitY * 10000));
             var left = StoryboardToScreen(transform.ApplyToPosition(Vector2.UnitX * -10000));
             var right = StoryboardToScreen(transform.ApplyToPosition(Vector2.UnitX * 10000));
 
-            var positionOffset = new Vector2(bounds.Width, bounds.Height)*0.5f;
-            //Debug.WriteLine(positionOffset);
+            //var positionOffset = new Vector2(bounds.Width, bounds.Height)*0.5f;
+            ////Debug.WriteLine(positionOffset);
 
-            center += positionOffset;
-            top += positionOffset;
-            bottom += positionOffset;
-            left += positionOffset;
-            right += positionOffset;
+            //center += positionOffset;
+            //top += positionOffset;
+            //bottom += positionOffset;
+            //left += positionOffset;
+            //right += positionOffset;
 
             var renderer = DrawState.Prepare(drawContext.Get<LineRenderer>(), camera, linesRenderStates);
             renderer.DrawSquare(new Vector3(bounds.Left, bounds.Top, 0), new Vector3(bounds.Right, bounds.Bottom, 0), Color4.DarkGray);
@@ -62,17 +64,17 @@ namespace StorybrewEditor.UserInterface.Drawables
             renderer.Draw(new Vector3(left + Vector2.One), new Vector3(right + Vector2.One), Color4.Black);
 
             Color4 DrawColor = Color4.Blue;
-            switch (ui.GetState())
+            switch (ui.GetTransformType())
             {
-                case PlacementUi.PlacementUIState.Scaling:
+                case PlacementUi.PlacementUITransformType.Scale:
                     DrawColor = Color4.Green;
                     break;
-                case PlacementUi.PlacementUIState.Rotating:
+                case PlacementUi.PlacementUITransformType.Rotate:
                     DrawColor = Color4.Red;
                     break;
                 default:break;
             }
-           
+            
             renderer.DrawCircle(center, RingDistance, DrawColor);
             renderer.Draw(new Vector3(top), new Vector3(bottom), Color4.Blue);
             renderer.Draw(new Vector3(left), new Vector3(right), Color4.Blue);

@@ -23,7 +23,7 @@ namespace StorybrewEditor.Storyboarding
         private double endTime;
         public override double EndTime => endTime;
 
-        public override Vector2 Origin { get; set; }
+        public override Vector2 Origin { get; set; } = Vector2.Zero;
         public override Vector2 Position { get; set; }
         public override double Rotation { get; set; }
         public override double Scale { get; set; } = 1f;
