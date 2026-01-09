@@ -26,8 +26,10 @@ namespace StorybrewEditor.UserInterface.Drawables
         private StoryboardTransform transform;
         private float scaleFactor;
         private Vector2 offset;
+        private Vector2 center;
 
         internal Vector2 Offset => offset;
+        internal Vector2 Center => center;
 
         private readonly PlacementUi ui;
 
@@ -41,7 +43,7 @@ namespace StorybrewEditor.UserInterface.Drawables
             transform = Segment.BuildTransform(ParentTransform);
             scaleFactor = bounds.Height / 480;
             offset = new Vector2(bounds.Left + bounds.Width * 0.5f - 320 * scaleFactor, bounds.Top + bounds.Height * 0.5f - 240 * scaleFactor);
-            var center = StoryboardToScreen(transform.ApplyToPosition(Vector2.Zero));
+            center = StoryboardToScreen(transform.ApplyToPosition(Vector2.Zero));
             var top = StoryboardToScreen(transform.ApplyToPosition(Vector2.UnitY * -10000));
             var bottom = StoryboardToScreen(transform.ApplyToPosition(Vector2.UnitY * 10000));
             var left = StoryboardToScreen(transform.ApplyToPosition(Vector2.UnitX * -10000));

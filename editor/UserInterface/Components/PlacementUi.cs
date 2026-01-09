@@ -247,11 +247,12 @@ namespace StorybrewEditor.UserInterface.Components
                     break;
                 case PlacementUITransformType.Rotate:
                     //calculate something here man idk
-                    rotationVector = placementDrawable.ScreenToSegment(mousePosition) - placementDrawable.Offset;
-                    rotationVector.Normalize();
+                    rotationVector = placementDrawable.StoryboardToScreen(placementDrawable.Center) - mousePosition;
+
+                    var norm_rotVec = rotationVector.Normalized();
                     //offsetVector.X - cos
                     //offsetVector.Y - sin
-                    Segment.Rotation = Math.Atan2(rotationVector.Y, rotationVector.X);
+                    Segment.Rotation = Math.Atan2(norm_rotVec.Y, norm_rotVec.X);
                     
                     break;
             }
@@ -266,7 +267,7 @@ namespace StorybrewEditor.UserInterface.Components
                 placementDrawable.Draw(drawContext, Manager.Camera, Bounds, actualOpacity);
 
             var renderer = DrawState.Prepare(drawContext.Get<LineRenderer>(), Manager.Camera, linesRenderStates);
-            renderer.Draw(new Vector3(Segment.Position), new Vector3(Segment.Position + rotationVector * 10), Color4.Yellow);
+            renderer.Draw(new Vector3(placementDrawable.Center), new Vector3(placementDrawable.Center+ rotationVector), Color4.Yellow);
         }
 
         internal enum PlacementUIState
