@@ -166,7 +166,6 @@ namespace StorybrewEditor.Storyboarding
                     return;
 
                 UpdateLayers(context.EditorLayers);
-                RaiseLayersChanged();
             });
         }
 
