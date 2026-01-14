@@ -17,6 +17,7 @@ namespace StorybrewEditor.Storyboarding
     {
         public Effect Effect { get; }
         public EditorStoryboardLayer Layer { get; }
+        public EditorStoryboardSegment Parent { get; }
         public override string Identifier { get; }
 
         private double startTime;
@@ -25,12 +26,15 @@ namespace StorybrewEditor.Storyboarding
         private double endTime;
         public override double EndTime => endTime;
 
-        public bool Highlight;
-
         public override Vector2 Origin { get; set; }
         public override Vector2 Position { get; set; }
         public override double Rotation { get; set; }
         public override double Scale { get; set; } = 1f;
+
+        public Vector2 PlacementPosition { get; set; }
+        public double PlacementRotation { get; set; }
+        public double PlacementScale { get; set; } = 1f;
+
         public override bool ReverseDepth { get; set; }
 
         public event ChangedHandler OnChanged;
@@ -44,10 +48,11 @@ namespace StorybrewEditor.Storyboarding
 
         private List<DisplayableObject>[] displayableBuckets;
 
-        public EditorStoryboardSegment(Effect effect, EditorStoryboardLayer layer, string identifier = null)
+        public EditorStoryboardSegment(Effect effect, EditorStoryboardLayer layer, EditorStoryboardSegment parent, string identifier = null)
         {
             Effect = effect;
             Layer = layer;
+            Parent = parent;
             Identifier = identifier;
         }
 
@@ -127,7 +132,7 @@ namespace StorybrewEditor.Storyboarding
 
             if (identifier == null || !namedSegments.TryGetValue(identifier, out var segment))
             {
-                segment = new EditorStoryboardSegment(Effect, Layer, identifier);
+                segment = new EditorStoryboardSegment(Effect, Layer, this, identifier);
                 storyboardObjects.Add(segment);
                 displayableObjects.Add(segment);
                 displayableBuckets = null;
@@ -174,7 +179,7 @@ namespace StorybrewEditor.Storyboarding
             if (Layer.Highlight || Effect.Highlight)
                 opacity *= (float)((Math.Sin(drawContext.Get<Editor>().TimeSource.Current * 4) + 1) * 0.5);
 
-            var localTransform = new StoryboardTransform(transform, Origin, Position, Rotation, (float)Scale);
+            var localTransform = this.BuildTransform(transform);
             if (displayableObjects.Count < 1000)
             {
                 foreach (var displayableObject in displayableObjects)
