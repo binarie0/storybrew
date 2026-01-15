@@ -55,6 +55,7 @@ namespace StorybrewEditor
             startEditor();
         }
 
+
         private static bool handleArguments(string[] args)
         {
             switch (args[0])
