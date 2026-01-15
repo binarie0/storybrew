@@ -197,7 +197,9 @@ namespace StorybrewEditor.Storyboarding
                 opacity *= (float)((Math.Sin(drawContext.Get<Editor>().TimeSource.Current * 4) + 1) * 0.5);
 
             //TODO: make this work with the timeline
-            var localTransform = new StoryboardTransform(transform, Origin, Position, Rotation, (float)Scale);
+            var localTransform = new StoryboardTransform(transform,
+                    Origin + (Vector2)originCommands.ValueAtTime(displayTime), 
+                    Position + (Vector2)moveCommands.ValueAtTime(displayTime), Rotation + rotateCommands.ValueAtTime(displayTime), (float)Scale + scaleCommands.ValueAtTime(displayTime));
             if (displayableObjects.Count < 1000)
             {
                 foreach (var displayableObject in displayableObjects)
